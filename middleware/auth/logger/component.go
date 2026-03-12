@@ -14,7 +14,7 @@ var (
 		Dependencies: component.Components{
 			logger.RequestComponent,
 		},
-		Run: component.StepFunc(func(container container.Container) error {
+		PreExecute: component.StepFunc(func(container container.Container) error {
 			return container.Invoke(func(r http.Router, logger *logger.Request) {
 				r.Use(logger)
 			})
@@ -27,7 +27,7 @@ var (
 		Dependencies: component.Components{
 			logger.ResponseComponent,
 		},
-		Run: component.StepFunc(func(container container.Container) error {
+		PreExecute: component.StepFunc(func(container container.Container) error {
 			return container.Invoke(func(r http.Router, logger *logger.Response) {
 				r.Use(logger)
 			})

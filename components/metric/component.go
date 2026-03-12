@@ -34,10 +34,10 @@ var Component = &component.Component{
 			flagSet.StringVar(&config.Endpoint, EndpointFieldName, EndpointDefault, "path for metrics endpoint")
 		})
 	}),
-	PreRun: component.StepFunc(func(container container.Container) error {
+	Configuration: component.StepFunc(func(container container.Container) error {
 		return container.Invoke(Configuration)
 	}),
-	Run: component.StepFunc(func(container container.Container) error {
+	PreExecute: component.StepFunc(func(container container.Container) error {
 		return container.Invoke(func(config *Config, r http.Router, logger logger.Logger) {
 			logger.Infof("[chi.router] add metrics endpoint - '%s'", config.Endpoint)
 			r.Mount(config.Endpoint, promhttp.Handler())

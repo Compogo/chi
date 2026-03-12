@@ -14,7 +14,7 @@ var (
 		Dependencies: component.Components{
 			metric.RequestCountComponent,
 		},
-		Run: component.StepFunc(func(container container.Container) error {
+		PreExecute: component.StepFunc(func(container container.Container) error {
 			return container.Invoke(func(r http.Router, metric *metric.RequestCount) {
 				r.Use(metric)
 			})
@@ -27,7 +27,7 @@ var (
 		Dependencies: component.Components{
 			metric.DurationComponent,
 		},
-		Run: component.StepFunc(func(container container.Container) error {
+		PreExecute: component.StepFunc(func(container container.Container) error {
 			return container.Invoke(func(r http.Router, metric *metric.Duration) {
 				r.Use(metric)
 			})
