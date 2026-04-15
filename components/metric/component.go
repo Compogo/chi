@@ -37,7 +37,7 @@ var Component = &component.Component{
 	Configuration: component.StepFunc(func(container container.Container) error {
 		return container.Invoke(Configuration)
 	}),
-	PreExecute: component.StepFunc(func(container container.Container) error {
+	Execute: component.StepFunc(func(container container.Container) error {
 		return container.Invoke(func(config *Config, r http.Router, logger logger.Logger) {
 			logger.Infof("[chi.router] add metrics endpoint - '%s'", config.Endpoint)
 			r.Mount(config.Endpoint, promhttp.Handler())

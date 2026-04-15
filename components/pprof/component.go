@@ -38,7 +38,7 @@ var Component = &component.Component{
 	Configuration: component.StepFunc(func(container container.Container) error {
 		return container.Invoke(Configuration)
 	}),
-	PreExecute: component.StepFunc(func(container container.Container) error {
+	Execute: component.StepFunc(func(container container.Container) error {
 		return container.Invoke(func(config *Config, r http.Router, logger logger.Logger) {
 			if config.UseProfile {
 				logger.Infof("[chi.router] add pprof endpoint - '%s'", config.Endpoint)

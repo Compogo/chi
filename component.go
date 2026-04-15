@@ -44,7 +44,7 @@ var Component = &component.Component{
 			func(router chi.Router) http.Router { return NewDecorator(router) },
 		)
 	}),
-	Execute: component.StepFunc(func(container container.Container) error {
+	PostExecute: component.StepFunc(func(container container.Container) error {
 		return container.Invoke(func(r http.Router, server http.Server) {
 			server.SetRouter(r)
 		})
