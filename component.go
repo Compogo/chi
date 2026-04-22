@@ -1,8 +1,6 @@
 package chi
 
 import (
-	"compress/gzip"
-
 	"github.com/Compogo/compogo/component"
 	"github.com/Compogo/compogo/container"
 	"github.com/Compogo/compogo/logger"
@@ -35,7 +33,6 @@ var Component = &component.Component{
 
 				router.Use(
 					middleware.Recoverer,
-					middleware.Compress(gzip.BestSpeed),
 					middleware.RequestLogger(&middleware.DefaultLogFormatter{Logger: logger, NoColor: true}),
 				)
 
