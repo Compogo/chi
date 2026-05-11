@@ -27,7 +27,7 @@ var Component = &component.Component{
 		token.Component,
 		chi.Component,
 	},
-	PreExecute: component.StepFunc(func(container container.Container) error {
+	Configuration: component.StepFunc(func(container container.Container) error {
 		return container.Invoke(func(r http.Router, auth *token.Auth) {
 			r.Use(auth)
 		})

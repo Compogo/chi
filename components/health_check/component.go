@@ -34,10 +34,11 @@ var Component = &component.Component{
 			flagSet.StringVar(&config.Endpoint, EndpointFieldName, EndpointDefault, "path for liveness test endpoint")
 		})
 	}),
-	Configuration: component.StepFunc(func(container container.Container) error {
-		return container.Invoke(Configuration)
-	}),
-	PreExecute: component.StepFunc(func(container container.Container) error {
+	Configuration: component.StepFunc(func(container container.Container) (err error) {
+		if err = container.Invoke(Configuration); err != nil {
+			return err
+		}
+
 		return container.Invoke(func(config *Config, r http.Router, logger logger.Logger) {
 			logger.Infof("[chi.router] add health endpoint - '%s'", config.Endpoint)
 			r.Use(http.MiddlewareFunc(middleware.Heartbeat(config.Endpoint)))
