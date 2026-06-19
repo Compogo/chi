@@ -2,33 +2,20 @@ package basic
 
 import (
 	"github.com/Compogo/chi"
-	"github.com/Compogo/compogo/component"
-	"github.com/Compogo/compogo/container"
-	"github.com/Compogo/http"
-	"github.com/Compogo/http/middleware/auth/basic"
+	"github.com/Compogo/compogo"
+	httpServer "github.com/Compogo/http_server"
+	"github.com/Compogo/http_server/middleware/auth/basic"
 )
 
-// Component automatically adds basic authentication middleware to the HTTP router.
-// It depends on:
-//   - basic.Component (the authentication middleware itself)
-//   - chi.Component (the router)
-//
-// Usage:
-//
-//	compogo.WithComponents(
-//	    http.Component,
-//	    chi.Component,
-//	    basic.Component,
-//	)
-//
-// All routes will now require valid basic authentication credentials.
-var Component = &component.Component{
-	Dependencies: component.Components{
-		basic.Component,
-		chi.Component,
+// Component — компонент Basic Auth для chi-роутера.
+// Подключает Basic Auth middleware ко всем маршрутам роутера.
+var Component = compogo.Component{
+	Dependencies: compogo.Components{
+		&basic.Component,
+		&chi.Component,
 	},
-	Configuration: component.StepFunc(func(container container.Container) error {
-		return container.Invoke(func(r http.Router, auth *basic.Auth) {
+	PreExecute: compogo.StepFunc(func(container compogo.Container) error {
+		return container.Invoke(func(r httpServer.Router, auth *basic.Auth) {
 			r.Use(auth)
 		})
 	}),

@@ -2,46 +2,40 @@ package pprof
 
 import (
 	"github.com/Compogo/chi"
-	"github.com/Compogo/compogo/component"
-	"github.com/Compogo/compogo/container"
+	"github.com/Compogo/compogo"
 	"github.com/Compogo/compogo/flag"
-	"github.com/Compogo/compogo/logger"
-	"github.com/Compogo/http"
+	httpServer "github.com/Compogo/http_server"
 	"github.com/go-chi/chi/v5/middleware"
 )
 
-// Component adds pprof debugging endpoints to the HTTP router when enabled.
-// It depends on chi.Component for the router.
-//
-// Usage:
-//
-//	compogo.WithComponents(
-//	    http.Component,
-//	    chi.Component,
-//	    pprof.Component,
-//	)
-//
-// Enable with: --trace.pprof=true --server.http.routes.pprof=/debug
-var Component = &component.Component{
-	Dependencies: component.Components{
-		chi.Component,
+// Component — компонент pprof эндпоинтов для chi-роутера.
+// Добавляет эндпоинты для профилирования (CPU, memory, goroutine и т.д.).
+// Включается только если UseProfile = true.
+var Component = &compogo.Component{
+	Dependencies: compogo.Components{
+		&chi.Component,
 	},
-	Init: component.StepFunc(func(container container.Container) error {
+	Init: compogo.StepFunc(func(container compogo.Container) error {
 		return container.Provide(NewConfig)
 	}),
-	BindFlags: component.BindFlags(func(flagSet flag.FlagSet, container container.Container) error {
+	BindFlags: compogo.BindFlags(func(flagSet flag.FlagSet, container compogo.Container) error {
 		return container.Invoke(func(config *Config) {
 			flagSet.BoolVar(&config.UseProfile, UseProfileFieldName, UseProfileDefault, "if true, add debug path to routing")
 			flagSet.StringVar(&config.Endpoint, EndpointFieldName, EndpointDefault, "path for debug endpoint")
 		})
 	}),
-	Configuration: component.StepFunc(func(container container.Container) error {
+	Configuration: compogo.StepFunc(func(container compogo.Container) error {
 		return container.Invoke(Configuration)
 	}),
-	PreExecute: component.StepFunc(func(container container.Container) error {
-		return container.Invoke(func(config *Config, r http.Router, logger logger.Logger) {
+	PreExecute: compogo.StepFunc(func(container compogo.Container) error {
+		return container.Invoke(func(config *Config, r httpServer.Router, logger compogo.Logger) {
 			if config.UseProfile {
-				logger.Infof("[chi.router] add pprof endpoint - '%s'", config.Endpoint)
+				logger.GetLogger("http").
+					GetLogger("server").
+					GetLogger("router").
+					GetLogger("chi").
+					Infof("add pprof endpoint - '%s'", config.Endpoint)
+
 				r.Mount(config.Endpoint, middleware.Profiler())
 			}
 		})

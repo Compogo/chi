@@ -2,46 +2,38 @@ package health_check
 
 import (
 	"github.com/Compogo/chi"
-	"github.com/Compogo/compogo/component"
-	"github.com/Compogo/compogo/container"
+	"github.com/Compogo/compogo"
 	"github.com/Compogo/compogo/flag"
-	"github.com/Compogo/compogo/logger"
-	"github.com/Compogo/http"
+	httpServer "github.com/Compogo/http_server"
 	"github.com/go-chi/chi/v5/middleware"
 )
 
-// Component adds a health check endpoint to the HTTP router using chi's heartbeat middleware.
-// It depends on chi.Component for the router.
-//
-// Usage:
-//
-//	compogo.WithComponents(
-//	    http.Component,
-//	    chi.Component,
-//	    health_check.Component,
-//	)
-//
-// Health check responds with 200 OK at: /health-check (configurable)
-var Component = &component.Component{
-	Dependencies: component.Components{
-		chi.Component,
+// Component — компонент health-check эндпоинта для chi-роутера.
+// Добавляет эндпоинт для проверки живости сервиса (liveness probe).
+var Component = &compogo.Component{
+	Dependencies: compogo.Components{
+		&chi.Component,
 	},
-	Init: component.StepFunc(func(container container.Container) error {
+	Init: compogo.StepFunc(func(container compogo.Container) error {
 		return container.Provide(NewConfig)
 	}),
-	BindFlags: component.BindFlags(func(flagSet flag.FlagSet, container container.Container) error {
+	BindFlags: compogo.BindFlags(func(flagSet flag.FlagSet, container compogo.Container) error {
 		return container.Invoke(func(config *Config) {
 			flagSet.StringVar(&config.Endpoint, EndpointFieldName, EndpointDefault, "path for liveness test endpoint")
 		})
 	}),
-	Configuration: component.StepFunc(func(container container.Container) (err error) {
-		if err = container.Invoke(Configuration); err != nil {
-			return err
-		}
+	Configuration: compogo.StepFunc(func(container compogo.Container) (err error) {
+		return container.Invoke(Configuration)
+	}),
+	PreExecute: compogo.StepFunc(func(container compogo.Container) error {
+		return container.Invoke(func(config *Config, r httpServer.Router, logger compogo.Logger) {
+			logger.GetLogger("http").
+				GetLogger("server").
+				GetLogger("router").
+				GetLogger("chi").
+				Infof("add health endpoint - '%s'", config.Endpoint)
 
-		return container.Invoke(func(config *Config, r http.Router, logger logger.Logger) {
-			logger.Infof("[chi.router] add health endpoint - '%s'", config.Endpoint)
-			r.Use(http.MiddlewareFunc(middleware.Heartbeat(config.Endpoint)))
+			r.Use(httpServer.MiddlewareFunc(middleware.Heartbeat(config.Endpoint)))
 		})
 	}),
 }

@@ -1,36 +1,38 @@
 package pprof
 
-import "github.com/Compogo/compogo/configurator"
+import (
+	"github.com/Compogo/compogo"
+)
 
 const (
-	// UseProfileFieldName is the command-line flag to enable pprof endpoints.
+	// UseProfileFieldName использовать ли pprof
 	UseProfileFieldName = "trace.pprof"
 
-	// EndpointFieldName is the command-line flag for pprof endpoint path.
+	// EndpointFieldName путь для pprof
 	EndpointFieldName = "server.http.routes.pprof"
+)
 
-	// UseProfileDefault disables pprof by default.
+var (
+	// UseProfileDefault включить pprof
 	UseProfileDefault = false
 
-	// EndpointDefault is the default path for pprof endpoints.
+	// EndpointDefault путь для pprof
 	EndpointDefault = "/debug"
 )
 
-// Config holds the pprof configuration.
-// It can be populated from command-line flags or config files.
+// Config содержит конфигурацию pprof эндпоинтов.
 type Config struct {
 	UseProfile bool
 	Endpoint   string
 }
 
-// NewConfig creates a new Config instance with default values.
+// NewConfig создаёт новую конфигурацию.
 func NewConfig() *Config {
 	return &Config{}
 }
 
-// Configuration applies configuration values to the Config struct.
-// It reads from the provided configurator and sets defaults if values are not present.
-func Configuration(config *Config, configurator configurator.Configurator) *Config {
+// Configuration загружает конфигурацию из Configurator.
+func Configuration(config *Config, configurator compogo.Configurator) *Config {
 	if config.UseProfile == UseProfileDefault {
 		configurator.SetDefault(UseProfileFieldName, UseProfileDefault)
 		config.UseProfile = configurator.GetBool(UseProfileFieldName)

@@ -1,40 +1,40 @@
 package chi
 
 import (
-	"github.com/Compogo/http"
+	httpServer "github.com/Compogo/http_server"
 	"github.com/go-chi/chi/v5"
 )
 
-// Decorator adapts a chi.Router to implement the http.Router interface.
-// This allows any chi router to be used with Compogo's HTTP server component.
+// Decorator — обёртка над chi.Router, реализующая интерфейс http_server.Router.
+// Позволяет использовать chi в качестве роутера в Compogo HTTP-сервере.
 type Decorator struct {
 	chi.Router
 }
 
-// NewDecorator creates a new Decorator wrapping the provided chi router.
+// NewDecorator создаёт новый декоратор для chi.Router.
 func NewDecorator(router chi.Router) *Decorator {
 	return &Decorator{Router: router}
 }
 
-// Use implements http.Router.Use by converting Compogo middlewares to chi middlewares.
-// It iterates through the provided middlewares and adds them to the underlying chi router.
-func (d *Decorator) Use(middlewares ...http.Middleware) {
+// Use добавляет middleware к роутеру.
+// Реализует интерфейс http_server.Router.
+func (d *Decorator) Use(middlewares ...httpServer.Middleware) {
 	for _, middleware := range middlewares {
 		d.Router.Use(middleware.Middleware)
 	}
 }
 
-// Group implements http.Router.Group by creating a sub-router with inherited middleware.
-// The provided function receives a wrapped http.Router that operates on the chi sub-router.
-func (d *Decorator) Group(fn func(r http.Router)) {
+// Group создаёт группу маршрутов с общим префиксом и middleware.
+// Реализует интерфейс http_server.Router.
+func (d *Decorator) Group(fn func(r httpServer.Router)) {
 	d.Router.Group(func(r chi.Router) {
 		fn(NewDecorator(r))
 	})
 }
 
-// Route implements http.Router.Route by creating a new sub-router with the given prefix.
-// The provided function receives a wrapped http.Router that operates on the chi sub-router.
-func (d *Decorator) Route(pattern string, fn func(r http.Router)) {
+// Route создаёт под-роутер для организации маршрутов.
+// Реализует интерфейс http_server.Router.
+func (d *Decorator) Route(pattern string, fn func(r httpServer.Router)) {
 	d.Router.Route(pattern, func(r chi.Router) {
 		fn(NewDecorator(r))
 	})

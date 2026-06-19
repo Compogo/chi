@@ -1,28 +1,27 @@
 package metric
 
-import "github.com/Compogo/compogo/configurator"
-
-const (
-	// EndpointFieldName is the command-line flag for metrics endpoint path.
-	EndpointFieldName = "server.http.routes.metrics"
-
-	// EndpointDefault is the default path for Prometheus metrics.
-	EndpointDefault = "/metrics"
+import (
+	"github.com/Compogo/compogo"
 )
 
-// Config holds the metrics endpoint configuration.
+// EndpointFieldName имя поля в конфигурации
+const EndpointFieldName = "server.http.routes.metrics"
+
+// EndpointDefault путь по умолчанию
+var EndpointDefault = "/metrics"
+
+// Config содержит конфигурацию metrics эндпоинта.
 type Config struct {
 	Endpoint string
 }
 
-// NewConfig creates a new Config instance with default values.
+// NewConfig создаёт новую конфигурацию.
 func NewConfig() *Config {
 	return &Config{}
 }
 
-// Configuration applies configuration values to the Config struct.
-// It reads from the provided configurator and sets defaults if values are not present.
-func Configuration(config *Config, configurator configurator.Configurator) *Config {
+// Configuration загружает конфигурацию из Configurator.
+func Configuration(config *Config, configurator compogo.Configurator) *Config {
 	if config.Endpoint == "" || config.Endpoint == EndpointDefault {
 		configurator.SetDefault(EndpointFieldName, EndpointDefault)
 		config.Endpoint = configurator.GetString(EndpointFieldName)
