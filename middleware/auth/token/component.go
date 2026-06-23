@@ -9,7 +9,7 @@ import (
 
 // Component — компонент Token Auth для chi-роутера.
 // Подключает Token Auth middleware ко всем маршрутам роутера.
-var Component = &compogo.Component{
+var Component = compogo.Component{
 	Dependencies: compogo.Components{
 		&token.Component,
 		&chi.Component,

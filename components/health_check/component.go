@@ -10,7 +10,7 @@ import (
 
 // Component — компонент health-check эндпоинта для chi-роутера.
 // Добавляет эндпоинт для проверки живости сервиса (liveness probe).
-var Component = &compogo.Component{
+var Component = compogo.Component{
 	Dependencies: compogo.Components{
 		&chi.Component,
 	},

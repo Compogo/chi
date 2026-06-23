@@ -10,7 +10,7 @@ import (
 
 // Component — компонент metrics эндпоинта для chi-роутера.
 // Добавляет эндпоинт для сбора метрик Prometheus.
-var Component = &compogo.Component{
+var Component = compogo.Component{
 	Dependencies: compogo.Components{
 		&chi.Component,
 	},

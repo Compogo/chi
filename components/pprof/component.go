@@ -11,7 +11,7 @@ import (
 // Component — компонент pprof эндпоинтов для chi-роутера.
 // Добавляет эндпоинты для профилирования (CPU, memory, goroutine и т.д.).
 // Включается только если UseProfile = true.
-var Component = &compogo.Component{
+var Component = compogo.Component{
 	Dependencies: compogo.Components{
 		&chi.Component,
 	},
